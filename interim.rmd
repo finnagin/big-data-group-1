@@ -1,0 +1,66 @@
+---
+title: "Interim Report"
+author: "Group 1"
+date: "4/18/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(GGally)
+library(glmnet)
+
+pop_data <- read_csv("psam_p41.csv")
+```
+
+```{r, echo=FALSE}
+pop_data$WAGP <- as.numeric(pop_data$WAGP)
+pop_data$JWMNP <- as.numeric(pop_data$JWMNP)
+pop_data$JWAP <- as.numeric(pop_data$JWAP)
+pop_data$PINCP <- as.numeric(pop_data$PINCP)
+pop_data$AGEP <- as.numeric(pop_data$AGEP)
+pop_data$SCHL <- as.numeric(pop_data$SCHL)
+pop_data$WKHP <- as.numeric(pop_data$WKHP)
+ggplot(filter(pop_data, JWTR == "01", AGEP < 30, AGEP > 20, JWAP > 94, JWAP < 118), aes(JWMNP, WAGP, color = JWAP)) +
+  geom_point() + geom_jitter()
+```
+
+```{r, echo=FALSE}
+pop_imp <- sample_n(select(pop_data, AGEP, PINCP, JWAP, JWMNP, WAGP, JWTR, SCHL, WKHP), 1000)
+pop_imp$PINCP <- log(pop_imp$PINCP)
+#pop_imp$SCHL <- log(pop_imp$SCHL)
+#pop_imp$WKHP <- log(pop_imp$WKHP)
+#pop_imp$JWMNP <- log(pop_imp$JWMNP)
+#pop_imp$AGEP <- sqrt(pop_imp$AGEP)
+ggpairs(select(filter(pop_imp, JWTR == "01", JWMNP <120), -JWTR, -JWAP, -WAGP))
+lin_mod <- lm(log(PINCP) ~ AGEP + JWMNP + SCHL + WKHP + JWTR, data = filter(pop_data, JWAP < 118, JWAP > 94))
+summary(lin_mod)
+```
+
+
+
+```{r, echo=FALSE}
+ggplot(filter(pop_data, AGEP < 30, AGEP > 20), aes(JWTR, PINCP, color = JWAP)) +
+  geom_boxplot()
+```
+
+```{r, echo=FALSE}
+tran_mode <- function(x){
+  if(x == 1){
+    return ("motorized_vehicle")
+  } else if (x == 2){
+    return ("public_transportation")
+  } else if(x == 3){
+    return ("human_transportation")
+  } else{
+    return ("other")
+  }
+}
+
+
+pop_reduced <- 
+```
