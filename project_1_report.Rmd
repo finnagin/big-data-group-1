@@ -41,7 +41,7 @@ In order to run the linear regression model, the assumptions of this model shoul
 As it was mentioned earlier 20 explanatory variables were initially examined for this study. Lasso technique were applied to get the best model. First, all the variables were included in the model. Then, we used lasso to find significant variables (figure 1) and dropped all the non-significant variables as shown in the equation below. Our target was to get a final model that would be the one with the best and most significant explanatory variables in it. Finally, the variable of interest was added as an aditional variable to the model.
 
 \begin{align*}
-\mu \{ WAGP | ... \} =& \beta_{0} + \beta_{1} *AGEP + \beta_{2} *WKHP + \beta_{3} *SCHL + \beta_{4} *MAR + \beta_{5} *SEX \\
+\mu \{ ln(WAGP) | ... \} =& \beta_{0} + \beta_{1} *AGEP + \beta_{2} *WKHP + \beta_{3} *SCHL + \beta_{4} *MAR + \beta_{5} *SEX \\
 &+ \beta_{6} *WKW3 + \beta_{7} *INSUR + \beta_{8} * JWMNP
 \end{align*}
 
@@ -106,7 +106,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Table 1: Variable Descriptions
 
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <-  data.frame(VARS = c("WAGP", "JWMNP", "JWAP", "AGEP", "WKHP", "SCHL", "PWGTP", "COW1", "COW2", "COW3", "COW4", "JWTR1", "JWTR2", "JWTR3", "JWTR4", "MAR", "MIL", "SEX", "WKW1", "WKW2", "WKW3", "INSUR", "VPS1", "VPS2", "VPS3", "DRAT"), DESCRIPTIONS = c("Ocupational income for the year", "Travel time to work in minutes", "Arrival time in 15 minutes after 12 AM", "Age in years", "Normal hors worked in a week", "Educational attainment", "Weight", "Private employee indicator", "Public employee indicator", "Self-employed indicator", "Unemployed/unpaid indicator", "Drove to work indicator", "Rode pubic transit to work indicator", "Biked/Walked to work indicator", "Worked from home indicator", "Married indicator", "Military service indicator", "Sex indicator (1 male/0 female)", "Worked < 20 weeks worked in past year indicator", "Worked between 20 and 40 week in last year indicator", "Worked > 40 weeks in past year indicator", "Have insurance indicator", "Served in either Gulf war", "Served between WWII and Vietnam", "Served before WWII", "Veteran Disability Percentage"))
+tabl <-  data.frame(VARS = c("WAGP", "JWMNP", "JWAP", "AGEP", "WKHP", "SCHL", "PWGTP", "COW1", "COW2", "COW3", "COW4", "JWTR1", "JWTR2", "JWTR3", "JWTR4", "MAR", "MIL", "SEX", "WKW1", "WKW2", "WKW3", "INSUR"), DESCRIPTIONS = c("Ocupational income for the year", "Travel time to work in minutes", "Arrival time in 15 minutes after 12 AM", "Age in years", "Normal hors worked in a week", "Educational attainment", "Weight", "Private employee indicator", "Public employee indicator", "Self-employed indicator", "Unemployed/unpaid indicator", "Drove to work indicator", "Rode pubic transit to work indicator", "Biked/Walked to work indicator", "Worked from home indicator", "Married indicator", "Military service indicator", "Sex indicator (1 male/0 female)", "Worked < 20 weeks worked in past year indicator", "Worked between 20 and 40 week in last year indicator", "Worked > 40 weeks in past year indicator", "Have insurance indicator"))
 knitr::kable(tabl) 
 ```
 
@@ -175,6 +175,21 @@ cow3_f <- function(x){
     return(1)
   } else {
     return(0)
+  }
+}
+
+
+cow_f <- function(x){
+  if (cow1_f(x)){
+    return (1)
+  } else if(cow2_f(x)){
+    return (2)
+  } else if(cow3_f(x)){
+    return (3)
+  } else if(cow4_f(x)){
+    return (4)
+  } else {
+    return (NA)
   }
 }
 
@@ -360,3 +375,184 @@ ggpairs(sample_n(filter(select(pop_lm_data, LOGWAGP, JWMNP, SCHL, AGEP,
 summary(pop_lm)
 ```
 
+
+### prep data for Question 2
+
+```{r, message=FALSE, results='hide'}
+pop_new_2 <- tbl_df(pop_new)
+tracemem(pop_new) == tracemem(pop_new_2)
+
+pop_new_2$COW1 <- NULL
+pop_new_2$COW2 <- NULL
+pop_new_2$COW3 <- NULL
+pop_new_2$COW4 <- NULL
+
+pop_new_2$JWTR2 <- NULL
+pop_new_2$JWTR3 <- NULL
+pop_new_2$JWTR4 <- NULL
+
+pop_new_2$WKW1 <- NULL
+pop_new_2$WKW2 <- NULL
+
+pop_new_2$COW <- as.numeric(lapply(as.numeric(pop_data$COW),cow_f))
+
+pop_omit_2 <- na.omit(pop_new_2)
+
+y2 <- pop_omit_2$WKHP
+
+pop_omit_2$WKHP <- NULL
+pop_omit_2$COW1 <- NULL
+pop_omit_2$COW2 <- NULL
+pop_omit_2$COW3 <- NULL
+pop_omit_2$COW4 <- NULL
+pop_omit_2$COW <- NULL
+
+X2 <- as.matrix(pop_omit_2)
+
+lasso <- glmnet(X2, y2)
+lasso.cv <- cv.glmnet(X2, y2)
+```
+
+## Question 2 Figures
+
+### Figure 7: LASSO Results
+
+```{r}
+coef(lasso.cv)
+```
+
+### Figure 8: Check assumptions
+
+```{r}
+pop_lm_data_2 <- na.omit(pop_new_2)
+pop_lm_test <- lm(WKHP ~ as.factor(COW), data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
+par(mfrow = c(2, 2))
+plot(pop_lm_test)
+```
+
+### Figure 9: Check the Multicolinearity
+
+```{r, warning=FALSE}
+
+pop_lm_2 <- lm(WKHP ~ as.factor(COW)+JWMNP+WAGP+JWAP+as.factor(JWTR1)+as.factor(WKW3)+as.factor(MART)+as.factor(SEXT), 
+               data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
+
+
+vif(pop_lm_2)
+```
+
+### Figure 10: Check linearity Assumptions
+
+```{r}
+ggpairs(sample_n(select(filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000), WKHP, WAGP, JWMNP, JWAP), 1000))
+```
+
+### Figure 11: Summary of Linear Model
+
+```{r}
+summary(pop_lm_2)
+```
+
+### Prep for question 3
+
+```{r, message=FALSE, results='hide'}
+
+pop_vet <- select(pop_data, AGEP, JWMNP)
+
+#pop_new$PINCP <- as.numeric(pop_data$PINCP)
+pop_vet$WAGP <- as.numeric(pop_data$WAGP)
+
+pop_vet$AGEP <- as.numeric(pop_data$AGEP)
+
+pop_vet$PWGTP <- as.numeric(pop_data$PWGTP)
+pop_vet$SCHL <- as.numeric(pop_data$SCHL)
+
+#pop_vet$DIS <- as.numeric(pop_data$DIS)
+
+pop_vet$DRAT <- as.numeric(pop_data$DRAT)
+pop_vet$VPS <- as.factor(pop_data$VPS)
+
+na0 <- function(x){
+  if (is.na(x)){
+    return (0)
+  } else {
+    return (x)
+  }
+}
+
+pop_vet$JWMNP <- as.numeric(lapply(as.numeric(pop_data$JWMNP), na0))
+pop_vet$WKHP <- as.numeric(lapply(as.numeric(pop_data$WKHP), na0))
+
+vet_omit <- na.omit(pop_vet)
+
+y3 <- vet_omit$DRAT
+
+vet_omit$DRAT <- NULL
+vet_omit$VPS <- NULL
+
+# Gulf war erra
+vps1_f <- function(x){
+  if(!is.na(x) && (x <= 5)){
+    return(1)
+  } else {
+    return(0)
+  }
+}
+# WWII - Vietnam
+vps2_f <- function(x){
+  if(!is.na(x) && (x > 5 && x < 15 )){
+    return(1)
+  } else {
+    return(0)
+  }
+}
+
+vps_f <- function(x){
+  if (vps1_f(x)){
+    return (1)
+  } else if(vps2_f(x)){
+    return (2)
+  } else {
+    return (NA)
+  }
+}
+
+pop_vet$VPS1 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps1_f))
+pop_vet$VPS2 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps2_f))
+pop_vet$VPS <- as.numeric(lapply(as.numeric(pop_data$VPS), vps_f))
+
+vet_lm_data <- na.omit(pop_vet)
+
+X3 <- as.matrix(vet_omit)
+
+lasso <- glmnet(X3, y3)
+lasso.cv <- cv.glmnet(X3, y3)
+```
+
+## Figures for question 3
+
+### Figure 12: LASSO Results
+
+```{r}
+coef(lasso.cv)
+```
+
+### Figure 13: Check Assumptions
+
+```{r}
+vet_lm <- lm(DRAT ~ as.factor(VPS) + AGEP + WKHP + SCHL + PWGTP + WAGP, data = vet_lm_data)
+par(mfrow = c(2, 2))
+plot(vet_lm)
+```
+
+### Figure 14: Check the Multicolinearity
+
+```{r}
+vif(vet_lm)
+```
+
+### Summary of Linear Model
+
+```{r}
+summary(vet_lm)
+```

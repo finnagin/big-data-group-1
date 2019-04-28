@@ -236,15 +236,18 @@ coef(lasso.cv)
 
 
 pop_lm_data_2 <- na.omit(pop_new_2)
-pop_lm_2 <- lm(WKHP^2 ~ as.factor(COW)+JWMNP+WAGP+JWAP+as.factor(JWTR1)+as.factor(WKW3)+as.factor(MART)+as.factor(SEXT), 
-               data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10))
+
+pop_lm_2 <- lm(WKHP ~ as.factor(COW)+JWMNP+WAGP+JWAP+as.factor(JWTR1)+as.factor(WKW3)+as.factor(MART)+as.factor(SEXT), 
+               data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
+
+
 summary(pop_lm_2)
 
-pop_lm_data_2$WKHP2 <- pop_lm_data_2$WKHP^2
+vif(pop_lm_2)
 
-ggpairs(sample_n(select(filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000), WKHP2, WAGP, JWMNP, JWAP), 1000))
+ggpairs(sample_n(select(filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000), WKHP, WAGP, JWMNP, JWAP), 1000))
 
-pop_lm_test <- lm(WKHP^2 ~ AGEP, data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10))
+pop_lm_test <- lm(WKHP ~ as.factor(COW), data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
 par(mfrow = c(2, 2))
 plot(pop_lm_test)
 
@@ -343,22 +346,12 @@ vps2_f <- function(x){
     return(0)
   }
 }
-# Pre WWII
-vps3_f <- function(x){
-  if(!is.na(x) && (x == 15)){
-    return(1)
-  } else {
-    return(0)
-  }
-}
 
 vps_f <- function(x){
   if (vps1_f(x)){
     return (1)
   } else if(vps2_f(x)){
     return (2)
-  } else if(vps3_f(x)){
-    return (3)
   } else {
     return (NA)
   }
@@ -368,18 +361,19 @@ vps_f <- function(x){
 
 
 
-#pop_vet$VPS1 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps1_f))
-#pop_vet$VPS2 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps2_f))
-#pop_vet$VPS3 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps3_f))
+pop_vet$VPS1 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps1_f))
+pop_vet$VPS2 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps2_f))
 pop_vet$VPS <- as.numeric(lapply(as.numeric(pop_data$VPS), vps_f))
 
 vet_lm_data <- na.omit(pop_vet)
 
-vet_lm <- lm(DRAT ~ as.factor(VPS) + AGEP + WKHP + SCHL + PWGTP + WAGP, data = filter(pop_vet, DRAT < 6))
+vet_lm <- lm(DRAT ~ as.factor(VPS) + AGEP + WKHP + SCHL + PWGTP + WAGP, data = vet_lm_data)
 summary(vet_lm)
 
 par(mfrow = c(2, 2))
 plot(vet_lm)
+
+vif(vet_lm)
 
 dim(pop_vet)
 dim(pop_lm_data_2)
