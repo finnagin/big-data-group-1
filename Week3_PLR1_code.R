@@ -370,6 +370,8 @@ vet_lm_data <- na.omit(pop_vet)
 vet_lm <- lm(DRAT ~ as.factor(VPS) + AGEP + WKHP + SCHL + PWGTP + WAGP, data = vet_lm_data)
 summary(vet_lm)
 
+ggpairs(sample_n(select(vet_lm_data, DRAT, AGEP, WKHP, SCHL, PWGTP, WAGP), 1000))
+
 par(mfrow = c(2, 2))
 plot(vet_lm)
 

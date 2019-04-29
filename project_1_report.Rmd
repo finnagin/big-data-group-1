@@ -7,19 +7,14 @@ output: pdf_document
 
 # Background
 
+Dr. Sharmodeep provided us with the data through the US Census Bureau website. The data are related to the American Community Survey (ACS). They are compiled into different years period. The data that was used for this report between the years 2013 to 2017 for Public Use Microdata Samples (PUMPS) in Oregon State. The total observations of the data were 200,159 (N) data point with 286 (p) variables.
+
+
 # Question 1: Is there any relationship between work travel time and wage for employed Oregonians?
 
-## Introduction
-Based on the questions that we proposed from the last assignment, and the provided feedback, our team decided to start from there as a start point. Is there a relationship between travel time for work (JWMNP) and Total occupational income per year (WAGP) in Oregon was the question of interest for this report. There are many factors that can influence the rate of income; however, considering the variables which have reasonable explanation would be the strategy of fitting the model.
-
-## Objective
-The purpose of this project is to identify variables that may be considered as a contributing factor in the analysis of a total person income annually. In other words, we would like to find a reasonable answer for: What really makes a person having higher or lower income per year? And how other factors affect this rate.
-
-## Data
-The data was provided by Dr. Sharmodeep from the American Community Survey (ACS). In this report we considered Public Use Microdata Samples (PUMPS) data for the years between (2013 to 2017) in the State of Oregon.
-
 ## Exploratory Analysis
-One strategy recomemded in the model selection lectures is to fit a model using explanetry variables which are not of interest, preform model selection, and then add the variable of interest into the final selected model. (Variables defined in table 1)
+
+The question we are trying to understand, whether there is a relationship between the travel time for work (JWMNP) and person’s wages/ salary income per year (WAGP). The initial exploration of WAGP with JWMNP shows the data with high spread for which we performed log transformation on WAGP. Figure 5 shows the exploration of Person’s salary income associated with travel time to work. In addition, we explored how the Person’s school attainment, age and hours of work per week are associated to WAGP. 
 
 ## Preliminary Models
 
@@ -53,35 +48,52 @@ Variable JWMNP is a statistically significant (P-value < 0.001). Keeping all oth
 
 # Question 2: Is there a relationship between worker class and hours of work per week?
 
-## Introduction
-
-## Objective
-
-## Data
-
 ## Exploritory Analysis
 
+The question we are trying to understand, whether there is a relationship between the class of worker (COW) and the hours of work per week (WKHP). Figure 10 shows the initial exploration of Person’s Work hours per week associated with the class of worker. In addition, we explored how the Person’s wage per hour, travel time to work and time of arrival is associated to WKHP.
+
 ## Preliminary Models
+
+\begin{align*}
+\mu \{ WKHP | ... \} =& \beta_{0} + \beta_{1} *JWAP + \beta_{2} *AGEP + \beta_{3} *WAGP + \beta_{4} *SCHL + \beta_{5} *PWGTP \\ 
+&+ \beta_{6} *JWTR1 + \beta_{7}*MAR + \beta_{8}*MIL + \beta_{9}*SEX + \beta_{10}*WKW3 + \\
+&+\beta_{11}*INSUR+\beta_{12}*JWMNP
+\end{align*}
 
 ## Model Checking and Model Selection
 
 ### Model Checking
 
+In order to run the linear regression model, the assumptions of this model should be met. Since the assumptions apply on the response variable, WKHP was investigated. 1) multicollinearity: the pairs of observations are independent of each other, by checking the variance inflation factor (VIF), this assumption seems met (see figure 9). 2) normality: this assumption was checked by using (Q-Q plot), figure 8 shows that this assumption is met. Also, this assumption should not be a concern if we have a big sample size. 3) linearity: this assumption was check by using scatter plot (ggpairs function) between the response variable and the explanatory variables, this assumption seems met as shown in figure 10 . 4) constant variance: this assumption was assessed by using residual vs fitted as shown in figure 8 and this assumption seems met too.
+
 ### Model Selection
 
+Of the 12 explanatory variables that were initially examined for this study 4 non-significant variables were removed after Lasso technique was applied. Our target was to get a final model that would be the one with the best and most significant explanatory variables in it. Finally, the variable of interest was added as an aditional variable to the model which in this case was a categorical variable with 4 states thus 3 indicators were added with the 4th being considered as a reference for the others.
+
+\begin{align*}
+\mu \{ WKHP | ... \} =& \beta_{0} + \beta_{1} *JWAP + \beta_{3} *WAGP+ \beta_{4} *JWTR1 + \beta_{5}*MAR \\
+&+ \beta_{6}*SEX + \beta_{7}*WKW3+\beta_{8}*JWMNP+\beta_{9}*COW2+\beta_{10}*COW3\\
+&+\beta_{11}*COW4
+\end{align*}
+
+Figure 11 presents the final results of fitting the best multiple linear regression model to the dataset including estimates of coefficient, standard error, z-value and corresponding p-value.
+
 ## Inference
+
+Based on the first question of interest, linear regression model was used to predict normal hours worked per week (WKHP) by mainly using class of work as an explanatory variable. As mentioned, we broke down this variable into 4 categorical variables. In the model, we used private employee as the reference. The other three were statistically significant (P-value < 0.001). For example, a person who works as a public employee, it is more likely that he/she will work more hours in a week than being a private employee by (0.275). One possible explanation could be that usually public employee has to work the regular hours per week while on the other hand, for private sector, it could depend on the workload of the company or how fast an employee finishes their work. While being a self-employed or unemployed, it is less likely that they work less hours than being a private employee by 1.06 and 2.68 respectively. This also makes sense and it is self-explanatory. Other explanatory variables were also statistically significant (P-value < 0.001) ($\beta_{p}$ not equal zero) except for the marriage status was not statistically significant.
 
 # Question 3: Is there a relationship between veteran term of service and veteran disability percentage?
 
-## Introduction
-
-## Objective
-
-## Data
-
 ## Exploritory Analysis
 
+The question we are trying to understand, whether there is a relationship between the veteran period of service (VPS) and the veteran disability percentage (DRAT). With the initial exploration of veteran period of service which is categorized into 15 categories we transformed into two groups I & II Gulf war, Between Vietnam & WWII to easily understand the relationship which major period of service has the effect on DRAT.
+
 ## Preliminary Models
+
+\begin{align*}
+\mu \{ DRAT | ... \} =& \beta_{0} + \beta_{1} *JWMNP + \beta_{2} *AGEP + \beta_{3} *WAGP + \beta_{4} *SCHL + \beta_{5} *PWGTP \\
+&+ \beta_{6} *WKHP
+\end{align*}
 
 ## Model Checking and Model Selection
 
@@ -89,9 +101,23 @@ Variable JWMNP is a statistically significant (P-value < 0.001). Keeping all oth
 
 ### Model Selection
 
+\begin{align*}
+\mu \{ DRAT | ... \} =& \beta_{0} + \beta_{1} *AGEP + \beta_{2} *WAGP + \beta_{3} *SCHL + \beta_{4} *PWGTP + \beta_{5} *WKHP \\
+&+ \beta_{6}*VPS2
+\end{align*}
+
 ## Inference
 
-# Obstacles
+The first question of interest was veteran disability percentage, as shown in the linear regression model, the variable of interest, which is veteran period of service, is statistically significant (p-value = 0.01). veterans who served in Vietnam war and before are less likely to have higher percentage of disability rate than who served in Gulf war and beyond by (0.18). all other variables were statistically significant which mean we reject the null hypothesis that their coefficients are equal to zeros (p-value < 0.05).
+
+# Obstacles 
+
+Sampling: For the initial exploratory analysis it is hard to analyze the large sample of data since we are missing the underlying patterns. We then sampled the data into 10,000 points, performed initial exploration and based on the results we formulated the final model on which we concluded the results with the full data.
+
+More Categorical Variables: Explanatory variables like SCHL, COW, VPS have many categories which made hard to include and understand in the context of the problem. We transformed the initial list of categories, grouped in to sub categories and defined as Indicator variables. With this approach we are able to clean our data eliminating NA’s too. This transformation approach is very helpful while performing the model selection using LASSO, since LASSO takes the input x as numerical matrix only. 
+
+Technical issue: Since the data is very big, we had different technical issues especially with R. R seems very sensitive to a large sample size. Initially we tried Tidyr package to transform into tibbles as it easy to explore the data but other possible solution could be using different powerful statistical software that can handle big data. However, it is out of scope for this class. 
+
 
 # Discussion
 
@@ -106,7 +132,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Table 1: Variable Descriptions
 
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
-tabl <-  data.frame(VARS = c("WAGP", "JWMNP", "JWAP", "AGEP", "WKHP", "SCHL", "PWGTP", "COW1", "COW2", "COW3", "COW4", "JWTR1", "JWTR2", "JWTR3", "JWTR4", "MAR", "MIL", "SEX", "WKW1", "WKW2", "WKW3", "INSUR"), DESCRIPTIONS = c("Ocupational income for the year", "Travel time to work in minutes", "Arrival time in 15 minutes after 12 AM", "Age in years", "Normal hors worked in a week", "Educational attainment", "Weight", "Private employee indicator", "Public employee indicator", "Self-employed indicator", "Unemployed/unpaid indicator", "Drove to work indicator", "Rode pubic transit to work indicator", "Biked/Walked to work indicator", "Worked from home indicator", "Married indicator", "Military service indicator", "Sex indicator (1 male/0 female)", "Worked < 20 weeks worked in past year indicator", "Worked between 20 and 40 week in last year indicator", "Worked > 40 weeks in past year indicator", "Have insurance indicator"))
+tabl <-  data.frame(VARS = c("WAGP", "JWMNP", "JWAP", "AGEP", "WKHP", "SCHL", "PWGTP", "COW1", "COW2", "COW3", "COW4", "JWTR1", "JWTR2", "JWTR3", "JWTR4", "MAR", "MIL", "SEX", "WKW1", "WKW2", "WKW3", "INSUR", "VPS1", "VPS2", "DRAT"), DESCRIPTIONS = c("Ocupational income for the year", "Travel time to work in minutes", "Arrival time in 15 minutes after 12 AM", "Age in years", "Normal hours worked in a week", "Educational attainment", "Weight", "Private employee indicator", "Public employee indicator", "Self-employed indicator", "Unemployed/unpaid indicator", "Drove to work indicator", "Rode pubic transit to work indicator", "Biked/Walked to work indicator", "Worked from home indicator", "Married indicator", "Military service indicator", "Sex indicator (1 male/0 female)", "Worked < 20 weeks worked in past year indicator", "Worked between 20 and 40 week in last year indicator", "Worked > 40 weeks in past year indicator", "Have insurance indicator", "Verteran ended service after or in 1st gulf war indicator", "Veteran ended service in vietnam or before", "Veteran disability percentage"))
 knitr::kable(tabl) 
 ```
 
@@ -551,7 +577,7 @@ plot(vet_lm)
 vif(vet_lm)
 ```
 
-### Summary of Linear Model
+### Figure 15: Summary of Linear Model
 
 ```{r}
 summary(vet_lm)
