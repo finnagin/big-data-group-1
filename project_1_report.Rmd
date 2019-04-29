@@ -7,14 +7,13 @@ output: pdf_document
 
 # Background
 
-Dr. Sharmodeep provided us with the data through the US Census Bureau website. The data are related to the American Community Survey (ACS). They are compiled into different years period. The data that was used for this report between the years 2013 to 2017 for Public Use Microdata Samples (PUMPS) in Oregon State. The total observations of the data were 200,159 (N) data point with 286 (p) variables.
-
+Dr. Sharmodeep provided us with the data through the US Census Bureau website which is related to the American Community Survey (ACS). The data is compiled into different years of period. The data used for this report is a 5 year Public Use Microdata Samples (PUMS) population records for the years 2013 to 2017 in the State of Oregon. The observations include a total of 200,159 (N) data points with 286 (p) variables. Based on the strategy mentioned in the model selection lectures we fit a model using explanatory variables which are not of interest, perform model selection, and then add the variable of interest into the final selected model. (Variables defined in table 1)
 
 # Question 1: Is there any relationship between work travel time and wage for employed Oregonians?
 
 ## Exploratory Analysis
 
-The question we are trying to understand, whether there is a relationship between the travel time for work (JWMNP) and person’s wages/ salary income per year (WAGP). The initial exploration of WAGP with JWMNP shows the data with high spread for which we performed log transformation on WAGP. Figure 5 shows the exploration of Person’s salary income associated with travel time to work. In addition, we explored how the Person’s school attainment, age and hours of work per week are associated to WAGP. 
+The initial exploration of WAGP (wages) with JWMNP (travel time for work) shows the data with high spread for which we performed log transformation on WAGP. Figure 5 shows the exploration of Person’s salary income associated with travel time to work. In addition, we explored how the Person’s school attainment, age and hours of work per week are associated to WAGP. 
 
 ## Preliminary Models
 
@@ -27,11 +26,7 @@ The question we are trying to understand, whether there is a relationship betwee
  
 ## Model Checking and Model Selection
 
-### Model Checking
-
-In order to run the linear regression model, the assumptions of this model should be met. Since the assumptions apply on the response variable, WAGP was investigated. 1) multicollinearity: the pairs of observations are independent of each other, by checking the variance inflation factor (VIF), this assumption seems met (see figure 4). 2) normality: this assumption was checked by using (Q-Q plot), figure 2 shows that this assumption is not met so we transform the response variable by using log(WAGP) as shown in Figure 3 and this assumption seems better with log and through filtering ouliers who made less that $2500 last year. Also, this assumption should not be a concern if we have a big sample size. 3) linearity: this assumption was check by using scatter plot (ggpairs function) between the response variable and the explanatory variables, this assumption seems met as shown in figure 5 . 4) constant variance: this assumption was assessed by using residual vs fitted as shown in figure 3 and this assumption seems met too.
-
-### Model Selection
+In order to run the linear regression model, the assumptions of this model should be met. Since the assumptions apply on the response variable, WAGP was investigated. We started with checking the variance inflation factor (VIF, see figure 4). 1) normality: this assumption was checked by using (Q-Q plot), figure 2 shows that this assumption is not met so we transform the response variable by using log(WAGP) as shown in Figure 3 and this assumption seems better with log and through filtering ouliers who made less that $2500 last year. Also, this assumption should not be a concern if we have a big sample size. 2) linearity: this assumption was check by using scatter plot (ggpairs function) between the response variable and the explanatory variables, this assumption seems met as shown in figure 5 . 3) constant variance: this assumption was assessed by using residual vs fitted as shown in figure 3 and this assumption seems met too.
 
 As it was mentioned earlier 20 explanatory variables were initially examined for this study. Lasso technique were applied to get the best model. First, all the variables were included in the model. Then, we used lasso to find significant variables (figure 1) and dropped all the non-significant variables as shown in the equation below. Our target was to get a final model that would be the one with the best and most significant explanatory variables in it. Finally, the variable of interest was added as an aditional variable to the model.
 
@@ -48,7 +43,7 @@ Variable JWMNP is a statistically significant (P-value < 0.001). Keeping all oth
 
 # Question 2: Is there a relationship between worker class and hours of work per week?
 
-## Exploritory Analysis
+## Exploratory Analysis
 
 The question we are trying to understand, whether there is a relationship between the class of worker (COW) and the hours of work per week (WKHP). Figure 10 shows the initial exploration of Person’s Work hours per week associated with the class of worker. In addition, we explored how the Person’s wage per hour, travel time to work and time of arrival is associated to WKHP.
 
@@ -62,11 +57,7 @@ The question we are trying to understand, whether there is a relationship betwee
 
 ## Model Checking and Model Selection
 
-### Model Checking
-
-In order to run the linear regression model, the assumptions of this model should be met. Since the assumptions apply on the response variable, WKHP was investigated. 1) multicollinearity: the pairs of observations are independent of each other, by checking the variance inflation factor (VIF), this assumption seems met (see figure 9). 2) normality: this assumption was checked by using (Q-Q plot), figure 8 shows that this assumption is met. Also, this assumption should not be a concern if we have a big sample size. 3) linearity: this assumption was check by using scatter plot (ggpairs function) between the response variable and the explanatory variables, this assumption seems met as shown in figure 10 . 4) constant variance: this assumption was assessed by using residual vs fitted as shown in figure 8 and this assumption seems met too.
-
-### Model Selection
+In order to run the linear regression model, the assumptions of this model should be met. Since the assumptions apply on the response variable, WKHP was investigated. We started with checking the variance inflation factor (VIF, see figure 9). 1) normality: this assumption was checked by using (Q-Q plot), figure 8 shows that this assumption is met. Also, this assumption should not be a concern if we have a big sample size. 2) linearity: this assumption was check by using scatter plot (ggpairs function) between the response variable and the explanatory variables, this assumption seems met as shown in figure 10 . 3) constant variance: this assumption was assessed by using residual vs fitted as shown in figure 8 and this assumption seems met too.
 
 Of the 12 explanatory variables that were initially examined for this study 4 non-significant variables were removed after Lasso technique was applied. Our target was to get a final model that would be the one with the best and most significant explanatory variables in it. Finally, the variable of interest was added as an aditional variable to the model which in this case was a categorical variable with 4 states thus 3 indicators were added with the 4th being considered as a reference for the others.
 
@@ -76,7 +67,7 @@ Of the 12 explanatory variables that were initially examined for this study 4 no
 &+\beta_{11}*COW4
 \end{align*}
 
-Figure 11 presents the final results of fitting the best multiple linear regression model to the dataset including estimates of coefficient, standard error, z-value and corresponding p-value.
+Figure 11 presents the summary of results for fitting this linear model.
 
 ## Inference
 
@@ -84,7 +75,7 @@ Based on the first question of interest, linear regression model was used to pre
 
 # Question 3: Is there a relationship between veteran term of service and veteran disability percentage?
 
-## Exploritory Analysis
+## Exploratory Analysis
 
 The question we are trying to understand, whether there is a relationship between the veteran period of service (VPS) and the veteran disability percentage (DRAT). With the initial exploration of veteran period of service which is categorized into 15 categories we transformed into two groups I & II Gulf war, Between Vietnam & WWII to easily understand the relationship which major period of service has the effect on DRAT.
 
@@ -97,29 +88,32 @@ The question we are trying to understand, whether there is a relationship betwee
 
 ## Model Checking and Model Selection
 
-### Model Checking
+The assumptions for the linear regression model are observed with DRAT as response. 1) Normality: Based on the Q-Q plot of the linear model fit the data follows the straight line with slight variation assuming it should not be a concern for large amounts of data 2) Equal Variance: Based on the residual plot of the linear model fit (residual vs fitted) we observe the residuals are centered around 0 and follows equal spread which shows the assumption seems valid. 3) Linearity: With the initial exploration using scatterplot there seems a linear relation exists between response and explanatory variables included in the model. Finally, we checked whether there exists multicollinearity. Based on variance inflation factor (VIF) we didn’t observe any high values.
 
-### Model Selection
+Of the 6 explanatory variables that were initially examined for this study 5 remained after LASSO was applied. Then, the variable of interest was added as an aditional variable to the model which in this case was a categorical variable with 2 states thus 1 indicator was added with the 2nd being considered as a reference.
 
 \begin{align*}
 \mu \{ DRAT | ... \} =& \beta_{0} + \beta_{1} *AGEP + \beta_{2} *WAGP + \beta_{3} *SCHL + \beta_{4} *PWGTP + \beta_{5} *WKHP \\
 &+ \beta_{6}*VPS2
 \end{align*}
 
+Figure 15 presents the summary of results for fitting this linear model.
+
 ## Inference
 
-The first question of interest was veteran disability percentage, as shown in the linear regression model, the variable of interest, which is veteran period of service, is statistically significant (p-value = 0.01). veterans who served in Vietnam war and before are less likely to have higher percentage of disability rate than who served in Gulf war and beyond by (0.18). all other variables were statistically significant which mean we reject the null hypothesis that their coefficients are equal to zeros (p-value < 0.05).
+The first question of interest was veteran disability percentage, as shown in the linear regression model, the variable of interest, which is veteran period of service, is statistically significant (p-value = 0.01). veterans who served in Vietnam war and before are less likely to have higher percentage of disability rate than who served in the 1st Gulf war and beyond by (0.18). all other variables were statistically significant which mean we reject the null hypothesis that their coefficients are equal to zeros (p-value < 0.05).
 
 # Obstacles 
 
-Sampling: For the initial exploratory analysis it is hard to analyze the large sample of data since we are missing the underlying patterns. We then sampled the data into 10,000 points, performed initial exploration and based on the results we formulated the final model on which we concluded the results with the full data.
+Sampling: For the initial exploratory analysis it is hard to analyze the large sample of data since we are missing the underlying patterns. We then sampled the data, performed initial exploration, and based on the results we formulated the final model on which we concluded the results with the full data.
 
-More Categorical Variables: Explanatory variables like SCHL, COW, VPS have many categories which made hard to include and understand in the context of the problem. We transformed the initial list of categories, grouped in to sub categories and defined as Indicator variables. With this approach we are able to clean our data eliminating NA’s too. This transformation approach is very helpful while performing the model selection using LASSO, since LASSO takes the input x as numerical matrix only. 
+More Categorical Variables: Explanatory variables like SCHL, COW, VPS have many categories which made hard to include and understand in the context of the problem. We transformed the initial list of categories, grouped in to sub categories and defined as Indicator variables. This transformation approach is very helpful while performing the model selection using LASSO, since LASSO takes the input x as numerical matrix only. 
 
 Technical issue: Since the data is very big, we had different technical issues especially with R. R seems very sensitive to a large sample size. Initially we tried Tidyr package to transform into tibbles as it easy to explore the data but other possible solution could be using different powerful statistical software that can handle big data. However, it is out of scope for this class. 
 
-
 # Discussion
+
+Based on the questions we have suggested in our proposal, it seems the three questions were answered statistically in a meaningful way. 1) Is there any relationship between work travel time and wage for employed Oregonians? From this question we found that people who spend more time traveling to work, are more likely to have higher salary (statistically significant, P-value < 0.001). 2) Is there a relationship between worker class and hours of work per week? For this question we found that public employee usually works higher hours than other classifications (statistically significant). Finally, 3) Is there a relationship between veteran term of service and veteran disability percentage? For the last question, we found that veterans who participated in Vietnam war and before are less likely to have higher disability percentage than who participated in Gulf war and beyond (statistically significant, p-value = 0.01). In terms of future work, we could use more sophisticated models than multiple linear regression such as (binary logit model with random parameters or multinomial logit model), which can help us answering different important questions. Additionally, considering the interaction terms (e.g. gender) in the model is another way of improving our conclusion.
 
 \pagebreak
 
