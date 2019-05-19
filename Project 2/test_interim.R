@@ -30,7 +30,7 @@ features <- function(file_path, file_name){
   
   #im = im * 255
   
-  hog <- HOG(im, cells = 3, orientations = 6)
+  hog <- HOG(im, cells = 4, orientations = 6)
   return(hog)
 }
 
@@ -51,7 +51,32 @@ for(file in train_files){
   X[i,] <- append(features(train_path,file),ans$has_cactus[ans$id==file])
   i <- i+1
 }
-X2 <- as_tibble(X,colnames=cn)
-colnames(X2)=cn
+colnames(X)=cn
+X <- as_tibble(X,colnames=cn)
+X <- X %>%
+  mutate(y = factor(y))
 
-rf <- randomForest(y~.,data=X2)
+train_idx <- sample(1:nrow(X),11200)
+
+oob.err<-double(11)
+val.err<-double(11)
+
+#mtry is no of Variables randomly chosen at each split
+for(mtry in 5:15) 
+{
+  rf<-randomForest(y ~ . , data = X , subset = train_idx,mtry=mtry,ntree=500) 
+  oob.err[mtry-4] <- rf$err.rate[500] #Error of all Trees fitted
+  
+  pred<-predict(rf,X[-train_idx,])
+  val.err[mtry-4]<- with(X[-train_idx,],mean(y!=pred))
+}
+
+rf <- randomForest(y~.,data=X, ntrees=1500, mtry=14, subset=train_idx)
+
+rf_pred<-predict(rf,X[-train_idx,])
+rf.err<-with(X[-train_idx,],mean(y!=rf_pred))
+
+svm_model <- svm(y~.,data=X, kernel="radial", subset=train_idx)
+
+svm_pred<-predict(svm_model,X[-train_idx,])
+svm.err<- with(X[-train_idx,],mean(y!=svm_pred))
