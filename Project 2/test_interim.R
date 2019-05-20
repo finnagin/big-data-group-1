@@ -15,6 +15,7 @@ test_files <- list.files(test_path)
 
 ##########################################
 
+# feature generation function
 features <- function(file_path, file_name){
   path <- file.path(file_path, file_name)
   
@@ -56,6 +57,7 @@ X <- as_tibble(X,colnames=cn)
 X <- X %>%
   mutate(y = factor(y))
 
+set.seed(Sys.time())
 train_idx <- sample(1:nrow(X),11200)
 
 oob_err<-double(11)
@@ -81,7 +83,7 @@ for(k_type in c("linear", "sigmoid", "polynomial", "radial")){
   val_err[i]<- with(X[-train_idx,],mean(y!=pred))
   i = i+1
 }
-# output: l:0.10892857, s:0.20535714, p:0.13785714, r:0.07785714 -> Radial was best
+# output: l:0.10892857, s:0.20535714, p:0.13785714, r:0.07785714 => Radial was best
 
 val_err <- double(5)
 i <- 1
@@ -91,13 +93,17 @@ for(k in c(3,4,5,6,7)){
   val_err[i]<- with(X[-train_idx,],mean(y!=pred))
   i = i+1
 }
-# First run w/ c(.1,.5,1,5,10) -> 5 was best at 0.07321429
-# Second run w/ c(3,4,5,6,7) -> 4,5,6 were all equal & the same so 5 what we will go with
+# First run w/ c(.1,.5,1,5,10) => 5 was best at 0.07321429
+# Second run w/ c(3,4,5,6,7) => 4,5,6 were all equal & the same so 5 what we will go with
 
 rf <- randomForest(y~.,data=X, ntrees=1500, mtry=14, subset=train_idx)
 
 rf_pred<-predict(rf,X[-train_idx,])
+rf_pred_1<-predict(rf,filter(X[-train_idx,],y=="1"))
+rf_pred_0<-predict(rf,filter(X[-train_idx,],y=="0"))
 rf_err<-with(X[-train_idx,],mean(y!=rf_pred))
+rf_err_1<- with(filter(X[-train_idx,],y=="1"),mean(y!=rf_pred_1))
+rf_err_0<- with(filter(X[-train_idx,],y=="0"),mean(y!=rf_pred_0))
 
 svm_model <- svm(y~.,data=X, kernel="radial", cost=5, subset=train_idx)
 
