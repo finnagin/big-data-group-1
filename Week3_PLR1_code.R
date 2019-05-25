@@ -79,21 +79,6 @@ cow3_f <- function(x){
   }
 }
 
-
-cow_f <- function(x){
-  if (cow1_f(x)){
-    return (1)
-  } else if(cow2_f(x)){
-    return (2)
-  } else if(cow3_f(x)){
-    return (3)
-  } else if(cow4_f(x)){
-    return (4)
-  } else {
-    return (NA)
-  }
-}
-
 jwtr1_f <- function(x){
   if(!is.na(x) && (x == 1 || x == 8)){
     return(1)
@@ -180,7 +165,7 @@ insur_f <- function(x,y){
 pop_new$COW1 <- as.numeric(lapply(as.numeric(pop_data$COW), cow1_f))
 pop_new$COW2 <- as.numeric(lapply(as.numeric(pop_data$COW), cow2_f))
 pop_new$COW3 <- as.numeric(lapply(as.numeric(pop_data$COW), cow3_f))
-pop_new$COW4 <- as.numeric(lapply(as.numeric(pop_data$COW), cow4_f))
+pop_new$COW3 <- as.numeric(lapply(as.numeric(pop_data$COW), cow4_f))
 
 pop_new$JWTR1 <- as.numeric(lapply(as.numeric(pop_data$JWTR), jwtr1_f))
 pop_new$JWTR2 <- as.numeric(lapply(as.numeric(pop_data$JWTR), jwtr2_f))
@@ -197,77 +182,18 @@ pop_new$SEXT <- as.numeric(lapply(as.numeric(pop_data$SEX), sex_f))
 
 pop_new$INSUR <- as.numeric(mapply(insur_f, pop_data$PRIVCOV, pop_data$PUBCOV))
 
-#####################################################
-
-pop_new_2 <- tbl_df(pop_new)
-tracemem(pop_new) == tracemem(pop_new_2)
-
-pop_new_2$COW1 <- NULL
-pop_new_2$COW2 <- NULL
-pop_new_2$COW3 <- NULL
-pop_new_2$COW4 <- NULL
-
-pop_new_2$JWTR2 <- NULL
-pop_new_2$JWTR3 <- NULL
-pop_new_2$JWTR4 <- NULL
-
-pop_new_2$WKW1 <- NULL
-pop_new_2$WKW2 <- NULL
-
-pop_new_2$COW <- as.numeric(lapply(as.numeric(pop_data$COW),cow_f))
-
-pop_omit_2 <- na.omit(pop_new_2)
-
-y2 <- pop_omit_2$WKHP
-
-pop_omit_2$WKHP <- NULL
-pop_omit_2$COW1 <- NULL
-pop_omit_2$COW2 <- NULL
-pop_omit_2$COW3 <- NULL
-pop_omit_2$COW4 <- NULL
-pop_omit_2$COW <- NULL
-
-X2 <- as.matrix(pop_omit_2)
-
-lasso <- glmnet(X2, y2)
-lasso.cv <- cv.glmnet(X2, y2)
-
-coef(lasso.cv)
-
-
-pop_lm_data_2 <- na.omit(pop_new_2)
-
-pop_lm_2 <- lm(WKHP ~ as.factor(COW)+JWMNP+WAGP+JWAP+as.factor(JWTR1)+as.factor(WKW3)+as.factor(MART)+as.factor(SEXT), 
-               data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
-
-
-summary(pop_lm_2)
-
-vif(pop_lm_2)
-
-ggpairs(sample_n(select(filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000), WKHP, WAGP, JWMNP, JWAP), 1000))
-
-pop_lm_test <- lm(WKHP ~ as.factor(COW), data = filter(pop_lm_data_2, WKHP < 50, WKHP > 10, JWMNP < 120, WAGP < 200000))
-par(mfrow = c(2, 2))
-plot(pop_lm_test)
-
-
-###################################################
-
 pop_omit <- na.omit(pop_new)
 
-y1 <- pop_omit$WAGP
+y <- pop_omit$WAGP
 j_rem <- pop_omit$JWMNP
-
-
 
 pop_omit$WAGP <- NULL
 pop_omit$JWMNP <- NULL
 
 X <- as.matrix(pop_omit)
 
-lasso <- glmnet(X, y1)
-lasso.cv <- cv.glmnet(X, y1)
+lasso <- glmnet(X, y)
+lasso.cv <- cv.glmnet(X, y)
 
 coef(lasso.cv)
 
@@ -286,96 +212,5 @@ pop_lm_data$JWMNPSQ <- pop_lm_data$JWMNP^2
 
 ggpairs(sample_n(filter(select(pop_lm_data, LOGWAGP, JWMNP, SCHL, AGEP, WKHP),LOGWAGP > log(2500), JWMNP < (120), SCHL > 9), 1000))
 ggpairs(sample_n(filter(select(pop_lm_data, LOGWAGP, JWMNP, SCHL, LOGAGEP, WKHP),LOGWAGP > log(2500), JWMNP < (120), SCHL > 9), 1000))
-  
-
-############################################
-
-pop_vet <- select(pop_data, AGEP, JWMNP)
-
-#pop_new$PINCP <- as.numeric(pop_data$PINCP)
-pop_vet$WAGP <- as.numeric(pop_data$WAGP)
-
-pop_vet$AGEP <- as.numeric(pop_data$AGEP)
-
-pop_vet$PWGTP <- as.numeric(pop_data$PWGTP)
-pop_vet$SCHL <- as.numeric(pop_data$SCHL)
-
-#pop_vet$DIS <- as.numeric(pop_data$DIS)
-
-pop_vet$DRAT <- as.numeric(pop_data$DRAT)
-pop_vet$VPS <- as.factor(pop_data$VPS)
-
-na0 <- function(x){
-  if (is.na(x)){
-    return (0)
-  } else {
-    return (x)
-  }
-}
-
-pop_vet$JWMNP <- as.numeric(lapply(as.numeric(pop_data$JWMNP), na0))
-pop_vet$WKHP <- as.numeric(lapply(as.numeric(pop_data$WKHP), na0))
-
-vet_omit <- na.omit(pop_vet)
-
-y3 <- vet_omit$DRAT
-
-vet_omit$DRAT <- NULL
-vet_omit$VPS <- NULL
-
-X3 <- as.matrix(vet_omit)
-
-lasso <- glmnet(X3, y3)
-lasso.cv <- cv.glmnet(X3, y3)
-
-coef(lasso.cv)
-
-# Gulf war erra
-vps1_f <- function(x){
-  if(!is.na(x) && (x <= 5)){
-    return(1)
-  } else {
-    return(0)
-  }
-}
-# WWII - Vietnam
-vps2_f <- function(x){
-  if(!is.na(x) && (x > 5 && x < 15 )){
-    return(1)
-  } else {
-    return(0)
-  }
-}
-
-vps_f <- function(x){
-  if (vps1_f(x)){
-    return (1)
-  } else if(vps2_f(x)){
-    return (2)
-  } else {
-    return (NA)
-  }
-}
 
 
-
-
-
-pop_vet$VPS1 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps1_f))
-pop_vet$VPS2 <- as.numeric(lapply(as.numeric(pop_data$VPS), vps2_f))
-pop_vet$VPS <- as.numeric(lapply(as.numeric(pop_data$VPS), vps_f))
-
-vet_lm_data <- na.omit(pop_vet)
-
-vet_lm <- lm(DRAT ~ as.factor(VPS) + AGEP + WKHP + SCHL + PWGTP + WAGP, data = vet_lm_data)
-summary(vet_lm)
-
-ggpairs(sample_n(select(vet_lm_data, DRAT, AGEP, WKHP, SCHL, PWGTP, WAGP), 1000))
-
-par(mfrow = c(2, 2))
-plot(vet_lm)
-
-vif(vet_lm)
-
-dim(pop_vet)
-dim(pop_lm_data_2)
