@@ -1,17 +1,9 @@
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os		#,cv2
-from IPython.display import Image
-from keras.preprocessing import image
 from keras import optimizers
 from keras import layers,models
-from keras.applications.imagenet_utils import preprocess_input
-import matplotlib.pyplot as plt
-import seaborn as sns
-from keras import regularizers
 from keras.preprocessing.image import ImageDataGenerator
-from keras.applications.vgg16 import VGG16
 print(os.listdir("aci/"))
-from PIL import Image
 from keras.models import load_model
 
 import numpy as np
